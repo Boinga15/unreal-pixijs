@@ -1,0 +1,20 @@
+{
+    "name": "unreal-pixijs",
+    "version": "1.0.0",
+    "private": false,
+    "type": "module",
+    "dependencies": {
+        "@pixi/sound": "^6.0.1",
+        "pixi.js": "^8.8.1"
+    },
+    "scripts": {
+        "lint": "eslint ."
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.21.0",
+        "eslint": "^9.21.0",
+        "typescript": "~5.7.3",
+        "typescript-eslint": "^8.25.0",
+        "vite": "^6.2.0"
+    }
+}
