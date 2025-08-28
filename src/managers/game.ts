@@ -1,7 +1,9 @@
 import { Application, Graphics, Rectangle } from "pixi.js"
-import { Level } from "..";
+import { Actor, Level } from "..";
 
-// Constructors used to globally allow for any level to be created.
+// Constructors used to globally allow for any class to be created.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ActorConstructor<T extends Actor = Actor> = new (...args: any[]) => T; 
 
 /**
  * The main game class. Should be passed into every object used within the game that stems from Unreal PixiJS.
@@ -30,19 +32,47 @@ export class Game {
     mousePos: {x: number, y: number}
 
     /**
-     * 
+     * A list of mouse buttons currently being pressed. mouseDown[0] for left click, mouseDown[1] for middle mouse button, and mouseDown[2] for right click.
     */
     mouseDown: boolean[] = [false, false, false];
 
+    /**
+     * A list of keys that are being pressed. Use this to check for key inputs.
+     * @example if(game.keys["KeyA"]) { ... }
+     */
     keys: Record<string, boolean> = {};
 
+    /**
+     * A reference to the mask used to hide actors not within the game border.
+    */
     mask: Graphics;
 
+    /**
+     * The unscaled width of the game. This is not the actual width of the game after being scaled to the browser window.
+    */
     gameWidth: number
+
+    /**
+     * The unscaled height of the game. This is not the actual height of the game after being scaled to the browser window.
+    */
     gameHeight: number
+
+    /**
+     * The colour of the outside borders for the game window.
+    */
     borderColour: string = "#000000"
 
-    constructor(gameWidth: number, gameHeight: number, borderColour: string = "#000000") {
+    /**
+     * The colour of the game's background. In order to change the background colour during runtime, call the function "game.changeBackgroundColour()".
+    */
+    backgroundColour: string = "#383838ff";
+
+    /**
+     * A list of persistant actors currently present in the game. These actors are updated every frame, and are not removed when a new level is loaded. When adding or removing persistant actors, you should call "game.addPersistantActor()" or "game.removePersistantActor()" respsectively.
+     */
+    persistantActors: Actor[] = []
+
+    constructor(gameWidth: number, gameHeight: number, borderColour: string = "#000000", backgroundColour = "#383838ff") {
         // Define variables.
         this.app = new Application();
         this.gameHeight = gameHeight;
@@ -50,9 +80,10 @@ export class Game {
 
         this.mousePos = {x: 0, y: 0};
         this.borderColour = borderColour;
+        this.backgroundColour = backgroundColour;
 
         // Construct game window.
-        this.boundingBox = new Graphics().rect(0, 0, this.gameWidth, this.gameHeight).fill("#383838ff");
+        this.boundingBox = new Graphics().rect(0, 0, this.gameWidth, this.gameHeight).fill(this.backgroundColour);
         this.app.stage.addChild(this.boundingBox);
 
         // Creating Mask
@@ -149,5 +180,82 @@ export class Game {
         this.app.stage.y = (windowHeight - this.gameHeight * scale) / 2;
 
         this.app.stage.hitArea = new Rectangle(0, 0, scale, scale);
+    }
+
+    /**
+     * Change the background colour of the game to a different solid colour.
+     * @param newColour The new colour for the background.
+     */
+    changeBackgroundColour(newColour: string): void {
+        this.backgroundColour = newColour;
+
+        this.boundingBox.clear().rect(0, 0, this.gameWidth, this.gameHeight).fill("#ffffff");
+    }
+
+    /**
+     * Adds a persistant actor to the game.
+     * @param actor An actor object, which is a reference to the actor you wish to add to the game.
+     * @returns A reference to that actor object.
+     * 
+     * @example
+     * this.playerReference = this.game.addPersistantActor(new Player());
+     */
+    addPersistantActor(actor: Actor): Actor {
+        this.persistantActors.push(actor);
+        actor.onCreate(true, undefined);
+        return actor;
+    }
+
+    /**
+     * Removes an actor from the list of persistant actors, assuming said actor is on the list of persistant actors.
+     * @param actor The actor you wish to remove by reference.
+     * @returns Whether or not the actor was successfully removed (true if so, false otherwise).
+     * 
+     * @example
+     * for (const actor of this.game.persistantActors) {
+     *   if (actor.x <= -200) {
+     *     this.game.removePersistantActor(actor);
+     *   }
+     * }
+     */
+    removePersistantActor(actor: Actor): boolean {
+        if(!this.persistantActors.includes(actor)) {
+            return false;
+        }
+
+        actor.onRemove();
+        this.persistantActors = this.persistantActors.filter((cActor) => cActor !== actor);
+        return true;
+    }
+
+    /**
+     * Obtains all persistant actors of a given class, including actors who's class is a child of the given class.
+     * @param targetClass The class to search for.
+     * @returns A list of object references for every actor in the game's persistant actor list who has the given class.
+     * 
+     * @example
+     * this.managers = this.game.getPersistantActorsOfClass(Manager);
+     */
+    getPersistantActorsOfClass<T extends Actor>(targetClass: ActorConstructor<T>): T[] {
+        return this.persistantActors.filter((actor): actor is T => (actor instanceof targetClass));
+    }
+
+    /**
+     * Obtains the first instace of an actor in the persistant actor list who is an object of the given class, or is an object of a child of the given class.
+     * @param targetClass The class to search for.
+     * @returns A reference of the first actor's object who matches the given class. If no such actor exists within the level, this function returns "undefined" instead.
+     * 
+     * @example
+     * this.areaManager = getPersistantActorOfClass(AreaManager);
+     * this.areaManager?.updateArea();
+     */
+    getPersistantActorOfClass<T extends Actor>(targetClass: ActorConstructor<T>): T | undefined {
+        for (const actor of this.persistantActors) {
+            if (actor instanceof targetClass) {
+                return actor;
+            }
+        }
+
+        return undefined;
     }
 }
