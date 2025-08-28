@@ -154,8 +154,31 @@ export class Game {
             // The main game loop.
             this.app.ticker.add((time) => {
                 this.level?.update(time.deltaMS / 1000);
+
+                for (const actor of this.persistantActors) {
+                    actor.update(time.deltaMS / 1000);
+                }
             });
         })();
+    }
+
+    /**
+     * Load a level to the game. If another level is already loaded, that level becomes unloaded and the new one is loaded in its place. This function should be called at the very start of the game to load the first level.
+     * @param level An object reference to the level the game should load.
+     * @returns An object reference of the loaded level.
+     * 
+     * @example
+     * this.currentLevel = this.game.loadLevel(new MainLevel(this.game))
+     */
+    loadLevel(level: Level): Level {
+        if (this.level != undefined) {
+            this.level.onUnload();
+        }
+
+        this.level = level;
+        level.onLoad();
+
+        return level;
     }
 
     /**
