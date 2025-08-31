@@ -1,9 +1,13 @@
+import { Script } from "..";
 import { Game } from "../managers";
 import { Actor } from "./actors";
 
 // Used for getting all actors and widgets of a class.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ActorConstructor<T extends Actor = Actor> = new (...args: any[]) => T; 
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ScriptConstructor<T extends Script = Script> = new (...args: any[]) => T; 
 
 /**
  * Represents a level in the game. A level can be thought of like a scene. Actors exist within a level, and once the level is unloaded, the actors in that level disappear as well. It is best practice to almost always use levels wherever you want to display a new screen to the user, sincei t helps contanerise actor interactions and ensure that no actors unintendly spill over into the next scene.
@@ -127,5 +131,21 @@ export abstract class Level {
         }
 
         return undefined;
+    }
+
+    /**
+     * Obtains all actors in the level who implement a script of the given class.
+     * @param targetScriptClass The script class you want to query with. If the given script has children scripts, then those scripts will also be valid for the query.
+     * @returns A list of actors who all implement the given script.
+     * 
+     * @example
+     * const actors = this.level.getActorsImplementingScript(HealthScript);
+     * 
+     * for (const actor of actors) {
+     *     actor.getScript(HealthScript).takeDamage(5);
+     * }
+     */
+    getActorsImplementingScript<T extends Script>(targetScriptClass: ScriptConstructor<T>): Actor[] {
+        return this.actors.filter((actor) => actor.getScript(targetScriptClass) != undefined);
     }
 }

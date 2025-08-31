@@ -1,9 +1,12 @@
 import { Application, Graphics, Rectangle } from "pixi.js"
-import { Actor, Level } from "..";
+import { Actor, Level, Script } from "..";
 
 // Constructors used to globally allow for any class to be created.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ActorConstructor<T extends Actor = Actor> = new (...args: any[]) => T; 
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ScriptConstructor<T extends Script = Script> = new (...args: any[]) => T; 
 
 /**
  * The main game class. Should be passed into every object used within the game that stems from Unreal PixiJS.
@@ -280,5 +283,14 @@ export class Game {
         }
 
         return undefined;
+    }
+
+    /**
+     * Obtains all persistant actors who implement a script of the given class.
+     * @param targetScriptClass The script class to query using. If a script has children scripts, then querying for the parent script will also query for the children script.
+     * @returns A list of persistant actors who all
+     */
+    getPersistantActorsImplementingScript<T extends Script>(targetScriptClass: ScriptConstructor<T>): Actor[] {
+        return this.persistantActors.filter((actor) => actor.getScript(targetScriptClass) != undefined);
     }
 }

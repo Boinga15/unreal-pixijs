@@ -1,6 +1,11 @@
 import { Container } from "pixi.js";
 import { Game } from "../managers";
 import { Level } from "./level";
+import { Script } from "../scripts";
+
+// Used for getting all actors and widgets of a class.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ScriptConstructor<T extends Script = Script> = new (...args: any[]) => T; 
 
 
 /**
@@ -32,6 +37,17 @@ export abstract class Actor extends Container {
      * Whether or not this actor is considered a "persistant actor". Persistant actors are usually stored within "game.persistantActors", and are not automatically cleared when the level changes.
     */
     persistantActor: boolean = true
+
+    /**
+     * A list of every script that is attached to this actor. Scripts can either be added dynamically, or more likely, should be added all at once by setting this list to a hard-coded list of scripts you want this actor to have in the actor's constructor.
+     * 
+     * @example
+     * this.scripts = [
+     *  new HealthScript(),
+     *  new MovementScript()
+     * ]
+     */
+    scripts: Script[] = [];
     
     constructor(game: Game) {
         super();
@@ -42,7 +58,11 @@ export abstract class Actor extends Container {
      * The update function called every frame.
      * @param deltaTime The time in seconds between this frame and the previous frame.
      */
-    abstract update(deltaTime: number): void
+    update(deltaTime: number) {
+        for (const script of this.scripts) {
+            script.update(deltaTime);
+        }
+    }
 
     /**
      * Called when the actor is first created, whether it is persistant or not.
@@ -67,14 +87,37 @@ export abstract class Actor extends Container {
     }
 
     /**
-     * Removes the actor from the current level or persistant list of actors. Also calls "onRemove()" once done.
+     * Removes the actor from the current level or persistant list of actors. Effectively calls "onRemove()" once done.
      * 
+     * Note that if you want to override this function, it's recommended that you call super.onRemove() at the end of the function rather than at the start.
      * @example
      * if (this.health <= 0) {
      *   this.remove()
      * }
      */
     remove() {
+        if (this.level == undefined || this.persistantActor) {
+            this.game.removePersistantActor(this);
+        } else {
+            this.level.removeActor(this);
+        }
+    }
 
+    /**
+     * Gets a script the actor is currently using and has loaded. Returns a reference to the script if it exists, or undefined if it doesn't.
+     * @param targetScript The class of the script that is queried.
+     * @param ignoreDisabled Whether or not scripts that are disabled should be ignored. Normally set to false.
+     * 
+     * @example
+     * targetActor.getScript(HealthScript)?.damage(5);
+    */
+    getScript<T extends Script>(targetScript: ScriptConstructor<T>, ignoreDisabled: boolean = false): T | undefined {
+        for (const script of this.scripts) {
+            if (script instanceof targetScript && (script.isEnabled || (!ignoreDisabled))) {
+                return script;
+            }
+        }
+
+        return undefined;
     }
 }
