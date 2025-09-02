@@ -1,5 +1,5 @@
 import { Game } from "../managers";
-import { ChildEnemy, Enemy, Level1, Level2, Player, TestScript } from "./resources";
+import { ChildEnemy, Enemy, Level1, Level2, Player, TestScript, TestWidget1, TestWidget2, TestWidget3 } from "./resources";
 
 
 // Base assertion function.
@@ -122,5 +122,37 @@ assert(targetActor.getScript(TestScript)!.isEnabled, "Assertion Failure - Script
 
 console.log("Assertion Set #5 passed.")
 
+// Assertion Set #6 - Widgets
+game.level!.addWidget(new TestWidget1(game));
+game.level!.addWidget(new TestWidget2(game));
+game.level!.addWidget(new TestWidget2(game));
 
-console.log("All assertions passed.")
+assert(game.level!.widgets.length == 3, "Assertion Failure - " + game.level!.widgets.length.toString() + " widgets found in level instead of three.");
+assert(game.level!.getAllWidgetsOfClass(TestWidget2).length == 2, "Assertion Failure - " + game.level!.getAllWidgetsOfClass(TestWidget2).length.toString() + " instances of TestWidget2 found instead of two instances.");
+
+game.level!.removeWidget(game.level!.getAllWidgetsOfClass(TestWidget1)[0]);
+assert(game.level!.widgets.length == 2, "Assertion Failure - " + game.level!.widgets.length.toString() + " widgets found in level instead of two after deletion.");
+assert(game.level!.getAllWidgetsOfClass(TestWidget2).length == 2, "Assertion Failure - " + game.level!.getAllWidgetsOfClass(TestWidget2).length.toString() + " instances of TestWidget2 found instead of two instances after deletion.");
+
+const mainWidget = new TestWidget3(game);
+const subWidget = new TestWidget1(game);
+mainWidget.addSubWidget(subWidget);
+mainWidget.addSubWidget(new TestWidget1(game));
+mainWidget.addSubWidget(new TestWidget2(game));
+
+game.level!.addWidget(mainWidget);
+
+assert(game.level!.getWidgetOfClass(TestWidget3) === mainWidget, "Assertion Failure - getWidgetOfClass for level returns wrong result.");
+assert(mainWidget.subWidgets.length == 3, "Assertion Failure - " + mainWidget.subWidgets.length.toString() + " sub-widgets found instead of three.");
+assert(mainWidget.getAllSubWidgetsOfClass(TestWidget2).length == 1, "Assertion Failure - " + mainWidget.getAllSubWidgetsOfClass(TestWidget2).length.toString() + " instances of TestWidget2 found as subWidgets instead of one.");
+assert(mainWidget.getSubWidgetOfClass(TestWidget1) === subWidget, "Assertion Failure - getWidgetOfClass for widget returns wrong result.");
+
+mainWidget.removeSubWidget(subWidget);
+
+assert(mainWidget.subWidgets.length == 2, "Assertion Failure - " + mainWidget.subWidgets.length.toString() + " sub-widgets found instead of two after deletion.");
+assert(mainWidget.getAllSubWidgetsOfClass(TestWidget2).length == 1, "Assertion Failure - " + mainWidget.getAllSubWidgetsOfClass(TestWidget2).length.toString() + " instances of TestWidget2 found as subWidgets instead of one.");
+
+console.log("Assertion Set #6 passed.");
+
+
+console.log("All assertions passed.");

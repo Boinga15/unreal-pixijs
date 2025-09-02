@@ -1,5 +1,6 @@
 import { Actor, Level } from "../objects";
 import { Script } from "../scripts";
+import { Widget } from "../widgets";
 
 export class Player extends Actor {}
 
@@ -38,3 +39,8 @@ export class TestScript extends Script {
         console.log(deltaTime);
     }
 }
+
+
+export class TestWidget1 extends Widget {}
+export class TestWidget2 extends Widget {}
+export class TestWidget3 extends Widget {}

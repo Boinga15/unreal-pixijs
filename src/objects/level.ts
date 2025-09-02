@@ -1,4 +1,4 @@
-import { Script } from "..";
+import { Script, Widget } from "..";
 import { Game } from "../managers";
 import { Actor } from "./actors";
 
@@ -8,6 +8,9 @@ type ActorConstructor<T extends Actor = Actor> = new (...args: any[]) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ScriptConstructor<T extends Script = Script> = new (...args: any[]) => T; 
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type WidgetConstructor<T extends Widget = Widget> = new (...args: any[]) => T; 
 
 /**
  * Represents a level in the game. A level can be thought of like a scene. Actors exist within a level, and once the level is unloaded, the actors in that level disappear as well. It is best practice to almost always use levels wherever you want to display a new screen to the user, sincei t helps contanerise actor interactions and ensure that no actors unintendly spill over into the next scene.
@@ -38,6 +41,11 @@ export abstract class Level {
      */
     actors: Actor[] = []
 
+    /**
+     * A list of currently managed widgets. To add to this list, use the function "addWidget", and use the function "removeWidget" to remove a widget.
+    */
+    widgets: Widget[] = []
+
     constructor(game: Game) {
         this.game = game;
     }
@@ -62,7 +70,11 @@ export abstract class Level {
      */
     onUnload() {
         for (const actor of this.actors) {
-            actor.remove()
+            actor.remove();
+        }
+
+        for (const widget of this.widgets) {
+            widget.deconstructWidget();
         }
     }
 
@@ -147,5 +159,56 @@ export abstract class Level {
      */
     getActorsImplementingScript<T extends Script>(targetScriptClass: ScriptConstructor<T>): Actor[] {
         return this.actors.filter((actor) => actor.getScript(targetScriptClass) != undefined);
+    }
+
+    /**
+     * Adds a widget to the level, calling onConstruct as well for that widget, as well as giving it a reference to the level.
+     * @param newWidget An object reference to the widget that should be added to the level.
+     * @returns A reference to the widget object that was just added.
+     */
+    addWidget(newWidget: Widget): Widget {
+        this.widgets.push(newWidget);
+        newWidget.level = this;
+        newWidget.onConstruct();
+
+        return newWidget;
+    }
+
+    /**
+     * Remove the given widget from the level.
+     * @param targetWidget A reference to the widget object that you want to remove from the level.
+     * @returns A boolean. True if the widget was successfully removed, false otherwise.
+     */
+    removeWidget(targetWidget: Widget): boolean {
+        if (this.widgets.includes(targetWidget)) {
+            targetWidget.deconstructWidget();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets all widgets in this level that have the given class, or is a child of the given class.
+     * @param targetWidget The class to query through.
+     * @returns A list of every widget currently in this level with the given class or a child of the given class.
+     */
+    getAllWidgetsOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T[] {
+        return this.widgets.filter((widget): widget is T => widget instanceof targetWidgetType);
+    }
+
+    /**
+     * Gets the first widget in this level that is an object of the given class or
+     * @param targetWidgetType The widget class to query for.
+     * @returns Either the first widget in this level which is an object of the class or a child of the class, or undefined if nothing was found.
+     */
+    getWidgetOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T | undefined {
+        for (const widget of this.widgets) {
+            if (widget instanceof targetWidgetType) {
+                return widget;
+            }
+        }
+
+        return undefined;
     }
 }
