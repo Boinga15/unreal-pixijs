@@ -31,6 +31,11 @@ export abstract class Widget extends Container {
     */
     subWidgets: Widget[] = []
 
+    /**
+     * Whether or not the widget is persistant, meaning it doesn't unload when the level unloads.
+    */
+    isPersistant: boolean = false
+
     constructor(game: Game, x: number = 0, y: number = 0) {
         super();
 
@@ -61,6 +66,10 @@ export abstract class Widget extends Container {
      */
     protected onDeconstruct() {
         this.game.app.stage.removeChild(this);
+
+        if (this.isPersistant) {
+            this.game.persistantWidgets = this.game.persistantWidgets.filter((widget) => widget !== this);
+        }
 
         if (this.level != undefined) {
             this.level.widgets = this.level.widgets.filter((widget) => widget !== this);

@@ -152,6 +152,23 @@ mainWidget.removeSubWidget(subWidget);
 assert(mainWidget.subWidgets.length == 2, "Assertion Failure - " + mainWidget.subWidgets.length.toString() + " sub-widgets found instead of two after deletion.");
 assert(mainWidget.getAllSubWidgetsOfClass(TestWidget2).length == 1, "Assertion Failure - " + mainWidget.getAllSubWidgetsOfClass(TestWidget2).length.toString() + " instances of TestWidget2 found as subWidgets instead of one.");
 
+game.addPersistantWidget(new TestWidget1(game));
+game.addPersistantWidget(new TestWidget1(game));
+game.addPersistantWidget(new TestWidget3(game));
+
+assert(game.persistantWidgets.length == 3, "Assertion Failure - " + game.persistantWidgets.length.toString() + " persistant widgets found instead of three.");
+assert(game.getAllPersistantWidgetsOfClass(TestWidget1).length == 2, "Assertion Failure - " + game.getAllPersistantWidgetsOfClass(TestWidget1).length.toString() + " instances of TestWidget1 found as persistant widgets instead of two.");
+assert(game.getPersistantWidgetOfClass(TestWidget3) === game.getAllPersistantWidgetsOfClass(TestWidget3)[0], "Assertion Failure - getPersistantWidgetOfClass returns incorrect result.")
+
+game.removePersistantWidget(game.getPersistantWidgetOfClass(TestWidget1)!);
+
+assert(game.persistantWidgets.length == 2, "Assertion Failure - " + game.persistantWidgets.length.toString() + " persistant widgets found instead of two after deletion.");
+assert(game.getAllPersistantWidgetsOfClass(TestWidget1).length == 1, "Assertion Failure - " + game.getAllPersistantWidgetsOfClass(TestWidget1).length.toString() + " instances of TestWidget1 found as persistant widgets instead of one after deletion.");
+
+game.loadLevel(new Level1(game));
+
+assert(game.persistantWidgets.length == 2, "Assertion Failure - " + game.persistantWidgets.length.toString() + " persistant widgets found instead of two after new level is loaded.");
+
 console.log("Assertion Set #6 passed.");
 
 

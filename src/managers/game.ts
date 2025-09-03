@@ -1,5 +1,5 @@
 import { Application, Graphics, Rectangle } from "pixi.js"
-import { Actor, Level, Script } from "..";
+import { Actor, Level, Script, Widget } from "..";
 
 // Constructors used to globally allow for any class to be created.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -7,6 +7,9 @@ type ActorConstructor<T extends Actor = Actor> = new (...args: any[]) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ScriptConstructor<T extends Script = Script> = new (...args: any[]) => T; 
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type WidgetConstructor<T extends Widget = Widget> = new (...args: any[]) => T; 
 
 /**
  * The main game class. Should be passed into every object used within the game that stems from Unreal PixiJS.
@@ -74,6 +77,11 @@ export class Game {
      * A list of persistant actors currently present in the game. These actors are updated every frame, and are not removed when a new level is loaded. When adding or removing persistant actors, you should call "game.addPersistantActor()" or "game.removePersistantActor()" respsectively.
      */
     persistantActors: Actor[] = []
+
+    /**
+     * A list of persistant widgets currently present in the game. These widgets are updated every frame, and aren't removed when a new level is loaded. Add widgets to this list through "addPersistantWidget", and remove them with "removePersistantWidget".
+    */
+    persistantWidgets: Widget[] = []
 
     constructor(gameWidth: number, gameHeight: number, borderColour: string = "#000000", backgroundColour = "#383838ff") {
         // Define variables.
@@ -160,6 +168,10 @@ export class Game {
 
                 for (const actor of this.persistantActors) {
                     actor.update(time.deltaMS / 1000);
+                }
+
+                for (const widget of this.persistantWidgets) {
+                    widget.update(time.deltaMS / 1000);
                 }
             });
         })();
@@ -292,5 +304,56 @@ export class Game {
      */
     getPersistantActorsImplementingScript<T extends Script>(targetScriptClass: ScriptConstructor<T>): Actor[] {
         return this.persistantActors.filter((actor) => actor.getScript(targetScriptClass) != undefined);
+    }
+
+    /**
+     * Adds a widget to the game as a persistant widget, calling onConstruct as well for that widget.
+     * @param newWidget An object reference to the widget that should be added to the level.
+     * @returns A reference to the widget object that was just added.
+     */
+    addPersistantWidget(newWidget: Widget): Widget {
+        this.persistantWidgets.push(newWidget);
+        newWidget.isPersistant = true;
+        newWidget.onConstruct();
+
+        return newWidget;
+    }
+
+    /**
+     * Remove the given widget from the list of persistant widgets.
+     * @param targetWidget A reference to the widget object that you want to remove from the level.
+     * @returns A boolean. True if the widget was successfully removed, false otherwise.
+     */
+    removePersistantWidget(targetWidget: Widget): boolean {
+        if (this.persistantWidgets.includes(targetWidget)) {
+            targetWidget.deconstructWidget();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets all persistant widgets that have the given class, or is a child of the given class.
+     * @param targetWidget The class to query through.
+     * @returns A list of every persistant widget with the given class or a child of the given class.
+     */
+    getAllPersistantWidgetsOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T[] {
+        return this.persistantWidgets.filter((widget): widget is T => widget instanceof targetWidgetType);
+    }
+
+    /**
+     * Gets the first persistant widget that is an object of the given class or
+     * @param targetWidgetType The widget class to query for.
+     * @returns Either the first persistant widget which is an object of the class or a child of the class, or undefined if nothing was found.
+     */
+    getPersistantWidgetOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T | undefined {
+        for (const widget of this.persistantWidgets) {
+            if (widget instanceof targetWidgetType) {
+                return widget;
+            }
+        }
+
+        return undefined;
     }
 }
