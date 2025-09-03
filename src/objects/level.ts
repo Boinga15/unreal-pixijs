@@ -58,6 +58,10 @@ export abstract class Level {
         for (const actor of this.actors) {
             actor.update(deltaTime);
         }
+
+        for (const widget of this.widgets) {
+            widget.update(deltaTime);
+        }
     }
 
     /**

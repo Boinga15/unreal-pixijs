@@ -1,4 +1,5 @@
 import { Game } from "../managers";
+import { WidgetText } from "../widgets";
 import { ChildEnemy, Enemy, Level1, Level2, Player, TestScript, TestWidget1, TestWidget2, TestWidget3 } from "./resources";
 
 
@@ -170,6 +171,21 @@ game.loadLevel(new Level1(game));
 assert(game.persistantWidgets.length == 2, "Assertion Failure - " + game.persistantWidgets.length.toString() + " persistant widgets found instead of two after new level is loaded.");
 
 console.log("Assertion Set #6 passed.");
+
+
+// Assertion Set #7 - Pre-Created Assets
+const newTextWidget = new WidgetText(game, 0, 0, {}, (deltaTime: number, widgetReference: WidgetText) => {
+    widgetReference.text = "Updated text alongside " + deltaTime.toString();
+});
+
+assert(newTextWidget.text === "Text Object", "Assertion Failure - Base value of text is " + newTextWidget.text + " and now 'Text Object'");
+
+game.level!.addWidget(newTextWidget);
+game.level!.update(1.0);
+
+assert(newTextWidget.text === "Updated text alongside " + (1.0).toString(), "Assertion Failure - Update Function for WidgetText isn't called or is faulty, new text is " + newTextWidget.text);
+
+console.log("Assertion Set #7 passed.");
 
 
 console.log("All assertions passed.");
