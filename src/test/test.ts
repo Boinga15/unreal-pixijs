@@ -188,4 +188,35 @@ assert(newTextWidget.text === "Updated text alongside " + (1.0).toString(), "Ass
 console.log("Assertion Set #7 passed.");
 
 
+// Assertion Set #8 - Mathematical Functions
+let value = game.getSquaredDistance({x: 2, y: 4}, {x: -3, y: 6});
+assert(value == 29, "Assertion Failure - getSquaredDistance returns " + value.toString() + " instead of 29.");
+
+value = game.getDistance({x: 3, y: -2}, {x: 4, y: 6});
+assert(Math.abs(value - 8) < 0.6226, "Assertion Failure - getDistance returns " + value.toString() + " instead of 8.06225");
+
+value = game.getAngle({x: 2, y: 4}, {x: 2, y: 9});
+assert(Math.abs(value - (Math.PI / 2)) <= 0.1, "Assertion Failure - getAngle for straight up results in value " + value.toString() + " instead of the half of PI.");
+
+value = game.getAngle({x: 2, y: -5}, {x: 3, y:1});
+assert(Math.abs(value - 1.4056) <= 0.1, "Assertion Failure - getAngle for angle set 2 returns " + value.toString() + " instead of 1.4056.");
+
+value = game.getAngle({x: 3, y: 1}, {x: 2, y: -5});
+assert(Math.abs(value - 4.5472) <= 0.1, "Assertion Failure - getAngle for angle set 3 returns " + value.toString() + " instead of 4.5472.");
+
+assert(game.pointToPointCollision({x: 3, y: 3}, {x: 3, y: 3}), "Assertion Failure - pointToPointCollision returns false for two points that have the same locations.");
+assert(!game.pointToPointCollision({x: 3, y: 3}, {x: 3, y: 5}), "Assertion Failure - pointToPointCollision returns true for points with different coordinates (set #1).");
+assert(!game.pointToPointCollision({x: 2, y: 5}, {x: 3, y: 5}), "Assertion Failure - pointToPointCollision returns true for points with different coordinates (set #2).");
+assert(!game.pointToPointCollision({x: 2, y: 3}, {x: 3, y: 5}), "Assertion Failure - pointToPointCollision returns true for points with different coordinates (set #3).");
+
+assert(game.pointToRectCollision({x: 3, y: 5}, {x: 2, y: 3, xSize: 5, ySize: 5}), "Assertion Failure - pointToRectCollision returns false for a point within a valid rectangle.");
+assert(!game.pointToRectCollision({x: -5, y: -3}, {x: 2, y: 3, xSize: 100, ySize: 100}), "Assertion Failure - Point to the left and above rectangle is considered inside of the rectangle.");
+assert(!game.pointToRectCollision({x: 6, y: 4}, {x: 2, y: 2, xSize: 3, ySize: 1}), "Assertion Failure - pointToRectCollision considers point to the right and below rectangle as in rectangle despite being clearly outside of it.");
+
+assert(game.rectToRectCollision({x: 2, y: 4, xSize: 3, ySize: 5}, {x: 1, y: 5, xSize: 4, ySize: 5}), "Assertion Failure - rectToRectCollision returns false despite two rectangles being clearly inside each other.");
+assert(!game.rectToRectCollision({x: 3, y: 3, xSize: 2, ySize: 3}, {x: 1, y: 7, xSize: 1, ySize: 3}), "Assertion Failure - rectToRectCollision returns true for two rectangles not overlapping in the slightest.");
+
+console.log("Assertion Set #8 passed.");
+
+
 console.log("All assertions passed.");

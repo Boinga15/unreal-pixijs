@@ -356,4 +356,77 @@ export class Game {
 
         return undefined;
     }
+
+    /**
+     * Checks if two points are colliding based on their locations on the game stage.
+     * @param point1 The x and y coordinates of the first point.
+     * @param point2 The x and y coordinates of the second point.
+     * @returns A boolean. True if the two points are colliding (they have the same coordinates), false otherwise.
+     */
+    pointToPointCollision(point1: {x: number, y: number}, point2: {x: number, y: number}): boolean {
+        return (point1.x == point2.x) && (point1.y == point2.y);
+    }
+
+    /**
+     * Checks if a point is contained within a given rectangular area on the game stage.
+     * @param point The x and y coordinates of the point.
+     * @param rect The x and y coordinates of the top-left corner of the rectangle, as well as the xSize and the ySize of the rectangle.
+     * @returns A boolean. True if the point is contained withing the rectangle, false otherwise.
+     */
+    pointToRectCollision(point: {x: number, y: number}, rect: {x: number, y: number, xSize: number, ySize: number}): boolean {
+        return ((point.x - rect.x) >= 0) && ((point.y - rect.y) >= 0) && ((point.x - rect.x) <= rect.xSize) && ((point.y - rect.y) <= rect.ySize);
+    }
+
+    /**
+     * Checks if two rectangles are colliding or not.
+     * @param rect1 The x, y, xSize, and ySize of the first rectangle.
+     * @param rect2 The x, y, xSize, and ySize of the second rectangle.
+     * @returns A boolean. True if the two rectangles are colliding, false otherwise.
+     */
+    rectToRectCollision(rect1: {x: number, y: number, xSize: number, ySize: number}, rect2: {x: number, y: number, xSize: number, ySize: number}): boolean {
+        return (rect1.x <= rect2.x + rect2.xSize) && (rect1.x + rect1.xSize >= rect2.x) && (rect1.y <= rect2.y + rect2.ySize) && (rect1.y + rect1.ySize >= rect2.y);
+    }
+    
+    /**
+     * Returns the squared distance between two given points.
+     * @param point1 The x and y coordinates of the first point.
+     * @param point2 The x and y coordinates of the second point.
+     * @returns The squared distance between the two points.
+     */
+    getSquaredDistance(point1: {x: number, y: number}, point2: {x: number, y: number}): number {
+        return (point1.x - point2.x)**2 + (point1.y - point2.y)**2;
+    }
+
+    /**
+     * Returns the distance between two given points. Uses square root, and thus may be less efficient than getSquaredDistance.
+     * @param point1 The x and y coordinates of the first point.
+     * @param point2 The x and y coordinates of the second point.
+     * @returns The distance between the two points.
+     */
+    getDistance(point1: {x: number, y: number}, point2: {x: number, y: number}): number {
+        return Math.sqrt(this.getSquaredDistance(point1, point2));
+    }
+
+    /**
+     * Obtains the angle between point2 and point1, returning it in radians. If the two points are colliding, then 0 rad is returned by default, which points horizontally to the right.
+     * @param point1 The x and y coordiantes of the first point.
+     * @param point2 The x and y coordinates of the second point.
+     * @returns The angle of point 2 from point 1 measured in radians as it would be on a cartesian grid. 0 rad is horizontal to the right, pi/2 rad is straight up, and so on.
+     */
+    getAngle(point1: {x: number, y: number}, point2: {x: number, y: number}): number {
+        const xDiff = point2.x - point1.x;
+        const yDiff = point2.y - point1.y;
+
+        let angle = (yDiff >= 0 ? Math.PI / 2 : (Math.PI * 3) / 2);
+
+        if (xDiff != 0) {
+            angle = Math.atan(yDiff / xDiff);
+
+            if (yDiff <= 0 && xDiff <= 0) {
+                angle += Math.PI;
+            }
+        }
+
+        return angle;
+    }
 }
