@@ -1,5 +1,5 @@
 import { Game } from "../managers";
-import { WidgetText } from "../widgets";
+import { WidgetButton, WidgetText } from "../widgets";
 import { ChildEnemy, Enemy, Level1, Level2, Player, TestScript, TestWidget1, TestWidget2, TestWidget3 } from "./resources";
 
 
@@ -174,9 +174,10 @@ console.log("Assertion Set #6 passed.");
 
 
 // Assertion Set #7 - Pre-Created Assets
-const newTextWidget = new WidgetText(game, 0, 0, {}, (deltaTime: number, widgetReference: WidgetText) => {
+const newTextWidget = new WidgetText(game, 0, 0, {});
+newTextWidget.updateFunction = (deltaTime: number, widgetReference: WidgetText) => {
     widgetReference.text = "Updated text alongside " + deltaTime.toString();
-});
+}
 
 assert(newTextWidget.text === "Text Object", "Assertion Failure - Base value of text is " + newTextWidget.text + " and now 'Text Object'");
 
@@ -184,6 +185,52 @@ game.level!.addWidget(newTextWidget);
 game.level!.update(1.0);
 
 assert(newTextWidget.text === "Updated text alongside " + (1.0).toString(), "Assertion Failure - Update Function for WidgetText isn't called or is faulty, new text is " + newTextWidget.text);
+
+const newButtonWidget = new WidgetButton(game, 0, 0, 100, 100, {});
+
+newButtonWidget.clickFunction = (deltaTime: number, widgetReference: WidgetButton) => {
+    widgetReference.label = "Updated text to " + deltaTime.toString();
+}
+newButtonWidget.heldFunction = (deltaTime: number, widgetReference: WidgetButton) => {
+    widgetReference.xSize += 2 * deltaTime;
+}
+newButtonWidget.releasedFunction = (deltaTime: number, widgetReference: WidgetButton) => {
+    widgetReference.xSize += 50 * deltaTime;
+}
+
+assert(newButtonWidget.label === "Button", "Assertion Failure - Base label of button isn't 'Button', and is instead " + newButtonWidget.label);
+assert(newButtonWidget.xSize === 100, "Assertion Failure - Button initial size isn't 100 and is instead " + newButtonWidget.xSize.toString());
+
+game.mousePos = {x: 50, y: 100};
+newButtonWidget.update(1.0);
+
+assert(newButtonWidget.label === "Button", "Assertion Failure - Label of button isn't 'Button' after first non-click test, and is instead " + newButtonWidget.label);
+
+game.mousePos = {x: 250, y: 100};
+game.mouseDown[0] = true;
+newButtonWidget.update(1.0);
+
+assert(newButtonWidget.label === "Button", "Assertion Failure - Label of button isn't 'Button' after second non-click test, and is instead " + newButtonWidget.label);
+
+game.mousePos = {x: 100, y: 100};
+newButtonWidget.update(1.0);
+
+assert(newButtonWidget.label === "Updated text to 1", "Assertion Failure - Label of button isn't 'Update text to 1' after first click test, and is instead " + newButtonWidget.label);
+assert(newButtonWidget.xSize === 100, "Assertion Failure - Button initial size isn't 100 and is instead " + newButtonWidget.xSize.toString() + " after first click.");
+
+newButtonWidget.update(1.0);
+assert(newButtonWidget.xSize == 102, "Assertion Failure - Button size isn't 102 and is instead " + newButtonWidget.xSize.toString() + " after first hold tick.");
+
+game.mouseDown[0] = false;
+newButtonWidget.update(1.0);
+assert(newButtonWidget.xSize == 152, "Assertion Failure - Button size isn't 152 and is instead " + newButtonWidget.xSize.toString() + " after first release.");
+
+game.mouseDown[0] = true;
+newButtonWidget.update(1.0);
+
+game.mousePos = {x: 250, y: 300};
+newButtonWidget.update(1.0);
+assert(newButtonWidget.xSize == 202, "Assertion Failure - Button size isn't 202 and is instead " + newButtonWidget.xSize.toString() + " after second release.");
 
 console.log("Assertion Set #7 passed.");
 

@@ -10,7 +10,8 @@ export type WidgetTextArguments = {
     anchor?: "left" | "center" | "right" | "justify",
     colour?: string,
     fontFamily?: string,
-    fontSize?: number
+    fontSize?: number,
+    updateFunction?: (deltaTime: number, widgetReference: WidgetText) => void
 }
 
 /**
@@ -58,18 +59,18 @@ export class WidgetText extends Widget {
     */
     updateFunction: (deltaTime: number, widgetReference: WidgetText) => void
 
-    constructor(game: Game, x: number, y: number, settings: WidgetTextArguments = {}, updateFunction: (deltaTime: number, widgetReference: WidgetText) => void = (() => {})) {
+    constructor(game: Game, x: number, y: number, settings: WidgetTextArguments = {}) {
         super(game);
 
         this.x = x;
         this.y = y;
-        this.updateFunction = updateFunction;
 
         this.text = (settings.text ? settings.text : "Text Object");
         this.fontFamily = (settings.fontFamily ? settings.fontFamily : "Arial");
         this.fontSize = (settings.fontSize ? settings.fontSize : 16);
         this.colour = (settings.colour ? settings.colour : "#ffffff");
         this.anchor = (settings.anchor ? settings.anchor : "left");
+        this.updateFunction = (settings.updateFunction ? settings.updateFunction : (() => {}));
 
         this.textObject = new Text({text: this.text, style: {
             fontFamily: this.fontFamily,
@@ -86,6 +87,7 @@ export class WidgetText extends Widget {
      * @param deltaTime The time between this frame and the last frame in seconds.
      */
     update(deltaTime: number) {
+        super.update(deltaTime);
         this.updateFunction(deltaTime, this);
 
         this.textObject.text = this.text;
