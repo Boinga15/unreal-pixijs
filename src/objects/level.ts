@@ -121,6 +121,18 @@ export abstract class Level {
     }
 
     /**
+     * Removes all actors from the level, calling their "onRemove()" functions and updating zIndexes.
+     */
+    removeAllActors() {
+        for (const actor of this.actors) {
+            actor.onRemove();
+        }
+
+        this.actors = [];
+        this.game.adjustZIndexes();
+    }
+
+    /**
      * Obtains all actors in the level of a given class, including actors who's class is a child of the given class.
      * @param targetClass The class to search for.
      * @returns A list of object references for every actor in the level who has the given class.
@@ -194,6 +206,18 @@ export abstract class Level {
         }
 
         return false;
+    }
+
+    /**
+     * Removes all widgets from the level, updating zIndexes as necessary by calling game.adjustZIndexes(). Also calls all of the widgets' "deconstructWidget" functions.
+     */
+    removeAllWidgets() {
+        for (const widget of this.widgets) {
+            widget.deconstructWidget();
+        }
+
+        this.widgets = [];
+        this.game.adjustZIndexes();
     }
 
     /**

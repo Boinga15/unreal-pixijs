@@ -1,4 +1,5 @@
 import { Game } from "../managers";
+import { HealthScript } from "../scripts";
 import { WidgetButton, WidgetText } from "../widgets";
 import { ChildEnemy, Enemy, Level1, Level2, Level3, Player, TestScript, TestWidget1, TestWidget2, TestWidget3 } from "./resources";
 
@@ -231,6 +232,30 @@ newButtonWidget.update(1.0);
 game.mousePos = {x: 250, y: 300};
 newButtonWidget.update(1.0);
 assert(newButtonWidget.xSize == 202, "Assertion Failure - Button size isn't 202 and is instead " + newButtonWidget.xSize.toString() + " after second release.");
+
+const healthActor = new Player(game);
+healthActor.scripts.push(new HealthScript(game, healthActor, 100));
+
+const scriptReference = healthActor.getScript(HealthScript)!;
+
+assert(scriptReference.health === 100, "Assertion Failure - Actor health is " + scriptReference.health.toString() + " instead of 100 on initialisation.");
+assert(scriptReference.health === scriptReference.maxHealth, "Assertion Failure - Health Script max health isn't equal to health.");
+
+scriptReference.rollingHealthSpeed = 0.8;
+scriptReference.takeDamage(50);
+
+assert(scriptReference.heldDamage === 50, "Assertion Failure - Held damage isn't 50 after taking 50 damage. Instead, it is " + scriptReference.heldDamage.toString());
+
+scriptReference.update(1.0);
+
+assert(scriptReference.heldDamage === 10, "Assertion Failure - Held damage isn't 10 after update by 1.0 seconds, instead it is " + scriptReference.heldDamage.toString());
+assert(scriptReference.health === 60, "Assertion Failure - Health isn't 60 after update by 1.0 seconds, instead being " + scriptReference.health.toString());
+
+scriptReference.update(2.0);
+
+assert(scriptReference.heldDamage >= 0.4 && scriptReference.heldDamage <= 0.4001, "Assertion Failure - Held damage isn't 0.4 after update by 3.0 seconds, instead it is " + scriptReference.heldDamage.toString());
+assert(scriptReference.health >= 50.4 && scriptReference.health <= 50.40001, "Assertion Failure - Health isn't 50.4 after update by 3.0 seconds, instead being " + scriptReference.health.toString());
+
 
 console.log("Assertion Set #7 passed.");
 

@@ -8,8 +8,19 @@ import { Actor } from "../objects";
  * 
 */
 export abstract class Script {
+    /**
+     * A reference to the game class that oversees everything.
+    */
     game: Game
+
+    /**
+     * A reference to the actor which owns and uses this script.
+    */
     owningActor: Actor
+
+    /**
+     * Whether or not this script is enabled.
+    */
     isEnabled: boolean = true
 
     constructor(game: Game, owningActor: Actor) {
