@@ -1,7 +1,6 @@
-import { Graphics } from "pixi.js";
+import { Graphics, Text } from "pixi.js";
 import { Game } from "../../managers";
 import { Widget } from "../widget";
-import { WidgetText } from "./text";
 
 /**
  * The arguments used by Button Widgets, all of which are optional and have default values if not passed into a WidgetButton.
@@ -88,6 +87,11 @@ export class WidgetButton extends Widget {
     disabled: boolean
 
     /**
+     * A reference to the displayed text widget on the button.
+    */
+    textWidget: Text
+
+    /**
      * The function called at the start of this button's main update function. Best used to update the status and function of the buttons depending on the game state.
      * 
      * @example
@@ -172,32 +176,37 @@ export class WidgetButton extends Widget {
         this.addChild(this.buttonRect);
     
         // Creating the text object.
-        this.addSubWidget(new WidgetText(this.game, 0, 0, {
-            text: this.label,
-            anchor: this.textAnchor,
-            colour: this.textColour,
-            fontFamily: this.textFontFamily,
+        this.textWidget = new Text({text: this.label, style: {
+            fill: this.textColour,
             fontSize: this.textFontSize,
+            fontFamily: this.textFontFamily
+        }});
+        this.updateText();
+        this.addChild(this.textWidget);
+    }
 
-            updateFunction: (_deltaTime: number, widgetReference: WidgetText) => {
-                widgetReference.text = this.label;
-                widgetReference.anchor = this.textAnchor;
-                widgetReference.colour = this.textColour;
-                widgetReference.fontFamily = this.textFontFamily;
-                widgetReference.fontSize = this.textFontSize;
+    /**
+     * A function responsible for updating the text with the 
+     */
+    private updateText() {
+        if (this.textAnchor == "center") {
+            this.textWidget.x = (this.xSize / 2);
+            this.textWidget.y = (this.ySize / 2);
+            this.textWidget.anchor.set(0.5);
+        } else if (this.textAnchor == "left") {
+            this.textWidget.x = 0;
+            this.textWidget.y = 0;
+            this.textWidget.anchor.set(0);
+        } else {
+            this.textWidget.x = this.xSize;
+            this.textWidget.y = this.ySize;
+            this.textWidget.anchor.set(1);
+        }
 
-                if (this.textAnchor == "center") {
-                    widgetReference.x = (this.xSize / 2);
-                    widgetReference.y = (this.ySize / 2);
-                } else if (this.textAnchor == "left") {
-                    widgetReference.x = 0;
-                    widgetReference.y = 0;
-                } else {
-                    widgetReference.x = this.xSize;
-                    widgetReference.y = this.ySize;
-                }
-            }
-        }));
+        this.textWidget.style.fill = this.textColour;
+        this.textWidget.style.fontSize = this.textFontSize;
+        this.textWidget.style.fontFamily = this.textFontFamily;
+        this.textWidget.text = this.label;
     }
 
     /**
@@ -233,5 +242,6 @@ export class WidgetButton extends Widget {
         }
 
         this.buttonRect.clear().rect(0, 0, this.xSize, this.ySize).fill(currentColour);
+        this.updateText();
     }
 }

@@ -1,6 +1,10 @@
 {
     "name": "unreal-pixijs",
-    "version": "1.0.0",
+    "version": "1.0.5",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": ["dist"],
     "private": false,
     "type": "module",
     "dependencies": {
@@ -11,7 +15,8 @@
     },
     "scripts": {
         "lint": "eslint .",
-        "test": "tsx src/test/test.ts"
+        "test": "tsx src/test/test.ts",
+        "build": "tsc"
     },
     "devDependencies": {
         "@eslint/js": "^9.21.0",

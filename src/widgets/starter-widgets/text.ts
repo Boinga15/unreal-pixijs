@@ -7,7 +7,7 @@ import { Widget } from "../widget";
  */
 export type WidgetTextArguments = {
     text?: string,
-    anchor?: "left" | "center" | "right" | "justify",
+    anchor?: "left" | "center" | "right",
     colour?: string,
     fontFamily?: string,
     fontSize?: number,
@@ -46,7 +46,7 @@ export class WidgetText extends Widget {
     /**
      * The position through which the text is anchored, with its overall position being shifted such that the anchor lines up with the given X and Y coordinates.
     */
-    anchor: "left" | "center" | "right" | "justify";
+    anchor: "left" | "center" | "right";
 
     /**
      * A custom update function that is called at the start of this widget's real update function. This function can be custom-defined in a way that this text naturally updates in a self-contained way.
@@ -69,12 +69,18 @@ export class WidgetText extends Widget {
         this.anchor = (settings.anchor ? settings.anchor : "left");
         this.updateFunction = (settings.updateFunction ? settings.updateFunction : (() => {}));
 
+        const anchorConversion = {
+            "left": 0,
+            "center": 0.5,
+            "right": 1
+        }
+
         this.textObject = new Text({text: this.text, style: {
             fontFamily: this.fontFamily,
             fontSize: this.fontSize,
-            fill: this.colour,
-            align: this.anchor
-        }});
+            fill: this.colour
+        }, 
+        anchor: anchorConversion[this.anchor]});
 
         this.addChild(this.textObject);
     }
@@ -87,10 +93,16 @@ export class WidgetText extends Widget {
         super.update(deltaTime);
         this.updateFunction(deltaTime, this);
 
+        const anchorConversion = {
+            "left": 0,
+            "center": 0.5,
+            "right": 1
+        }
+
         this.textObject.text = this.text;
         this.textObject.style.fontFamily = this.fontFamily;
         this.textObject.style.fontSize = this.fontSize;
         this.textObject.style.fill = this.colour;
-        this.textObject.style.align = this.anchor;
+        this.textObject.anchor.set(anchorConversion[this.anchor]);
     }
 }

@@ -1,7 +1,6 @@
 import { Graphics, Text, TextStyle } from "pixi.js";
 import { Game } from "../../managers";
 import { Widget } from "../widget";
-import { WidgetText } from "./text";
 
 /**
  * The arguments used for the WidgetInput element. Every argument is optional, and has default values if they are not supplied to the widget.
@@ -43,9 +42,9 @@ export class WidgetInput extends Widget {
     caret: Graphics;
 
     /**
-     * An instance of WidgetText used to display the text being typed or the placeholder text.
+     * The text that is currently being displayed in the widget itself.
     */
-    textWidget: WidgetText;
+    textWidget: Text;
 
     /**
      * The colour of the main widget box.
@@ -134,14 +133,12 @@ export class WidgetInput extends Widget {
         this.addChild(this.inputRect);
 
         // Text
-        this.textWidget = new WidgetText(this.game, 5, this.ySize / 2, {
-            text: this.placeholderText,
-            anchor: "left",
-            colour: "#888888", // grey placeholder
+        this.textWidget = new Text({text: this.placeholderText, style: {
             fontFamily: this.textFont,
             fontSize: this.textFontSize,
-        });
-        this.addSubWidget(this.textWidget);
+            fill: "#888888"
+        }, anchor: {x: 0, y: 0.5}, x: 5, y: this.ySize / 2});
+        this.addChild(this.textWidget);
 
         // Caret
         this.caret = new Graphics().rect(0, 0, 2, this.textFontSize).fill(this.textColour);
@@ -249,10 +246,10 @@ export class WidgetInput extends Widget {
         // Update text display
         if (this.value.length > 0) {
             this.textWidget.text = this.value;
-            this.textWidget.colour = this.textColour;
+            this.textWidget.style.fill = this.textColour;
         } else {
             this.textWidget.text = this.placeholderText;
-            this.textWidget.colour = "#888888";
+            this.textWidget.style.fill = "#888888";
         }
 
         // Caret blink
@@ -263,7 +260,12 @@ export class WidgetInput extends Widget {
             } else {
                 this.caret.visible = false;
             }
-            this.caret.x = 5 + this.textWidget.width + 2;
+
+            if (this.value.length > 0) {
+                this.caret.x = 7 + this.measureTextWidth(this.value.slice(0, this.caretIndex));
+            } else {
+                this.caret.x = 7;
+            }
         } else {
             this.caret.visible = false;
         }
