@@ -104,6 +104,43 @@ export class Game {
     }
 
     /**
+     * Adjusts the zIndexes of all actors and widgets currently on screen, taking into account their zOrder. Called automatically whenever an actor or widget is added/removed from the game or level. Also called once whenever a new level is loaded. The purpose of this function is to ensure that every loaded widget is rendered on top of every actor.
+     */
+    adjustZIndexes() {
+        let highestZIndex = -Infinity;
+
+        for (const actor of this.persistantActors) {
+            actor.zIndex = actor.zOrder;
+
+            if (actor.zOrder > highestZIndex) {
+                highestZIndex = actor.zOrder;
+            }
+        }
+
+        if (this.level) {
+            for (const actor of this.level.actors) {
+                actor.zIndex = actor.zOrder;
+
+                if (actor.zOrder > highestZIndex) {
+                    highestZIndex = actor.zOrder;
+                }
+            }
+        }
+
+        highestZIndex += 1;
+
+        for (const widget of this.persistantWidgets) {
+            widget.zIndex = highestZIndex + widget.zOrder;
+        }
+
+        if (this.level) {
+            for (const widget of this.level.widgets) {
+                widget.zIndex = highestZIndex + widget.zOrder;
+            }
+        }
+    }
+
+    /**
      * Called to start the main game loop, as well as begin registering keyboard and mouse input.
      */
     beginGame(): void {
@@ -193,6 +230,8 @@ export class Game {
         this.level = level;
         level.onLoad();
 
+        this.adjustZIndexes();
+
         return level;
     }
 
@@ -241,6 +280,7 @@ export class Game {
     addPersistantActor(actor: Actor): Actor {
         this.persistantActors.push(actor);
         actor.onCreate(true, undefined);
+        this.adjustZIndexes();
         return actor;
     }
 
@@ -263,7 +303,19 @@ export class Game {
 
         actor.onRemove();
         this.persistantActors = this.persistantActors.filter((cActor) => cActor !== actor);
+        this.adjustZIndexes();
         return true;
+    }
+
+    /**
+     * Removes all persistant actors currently loaded into the game, calling their remove() functions.
+     */
+    removeAllPersistantActors() {
+        for (const actor of this.persistantActors) {
+            actor.remove();
+        }
+
+        this.adjustZIndexes();
     }
 
     /**
@@ -315,6 +367,7 @@ export class Game {
         this.persistantWidgets.push(newWidget);
         newWidget.isPersistant = true;
         newWidget.onConstruct();
+        this.adjustZIndexes();
 
         return newWidget;
     }
@@ -327,10 +380,22 @@ export class Game {
     removePersistantWidget(targetWidget: Widget): boolean {
         if (this.persistantWidgets.includes(targetWidget)) {
             targetWidget.deconstructWidget();
+            this.adjustZIndexes();
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Removes all persistant widgets within the game class, running their deconstruct functions before removing them.
+     */
+    removeAllPersistantWidgets() {
+        for (const widget of this.persistantWidgets) {
+            widget.deconstructWidget();
+        }
+
+        this.adjustZIndexes();
     }
 
     /**

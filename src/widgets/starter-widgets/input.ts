@@ -112,8 +112,8 @@ export class WidgetInput extends Widget {
     */
     updateFunction: (deltaTime: number, widget: WidgetInput) => void;
 
-    constructor(game: Game, x: number, y: number, xSize: number, ySize: number, settings: WidgetInputArguments) {
-        super(game, x, y);
+    constructor(game: Game, x: number, y: number, xSize: number, ySize: number, settings: WidgetInputArguments, zOrder: number = 0) {
+        super(game, x, y, zOrder);
 
         this.xSize = xSize;
         this.ySize = ySize;

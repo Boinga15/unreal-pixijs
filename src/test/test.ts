@@ -1,6 +1,6 @@
 import { Game } from "../managers";
 import { WidgetButton, WidgetText } from "../widgets";
-import { ChildEnemy, Enemy, Level1, Level2, Player, TestScript, TestWidget1, TestWidget2, TestWidget3 } from "./resources";
+import { ChildEnemy, Enemy, Level1, Level2, Level3, Player, TestScript, TestWidget1, TestWidget2, TestWidget3 } from "./resources";
 
 
 // Base assertion function.
@@ -264,6 +264,34 @@ assert(game.rectToRectCollision({x: 2, y: 4, xSize: 3, ySize: 5}, {x: 1, y: 5, x
 assert(!game.rectToRectCollision({x: 3, y: 3, xSize: 2, ySize: 3}, {x: 1, y: 7, xSize: 1, ySize: 3}), "Assertion Failure - rectToRectCollision returns true for two rectangles not overlapping in the slightest.");
 
 console.log("Assertion Set #8 passed.");
+
+
+// Assertion Set #9 - Z-Indexes
+game.loadLevel(new Level3(game));
+
+game.removeAllPersistantActors();
+game.removeAllPersistantWidgets();
+
+game.level!.addActor(new Player(game, 0, 0, 0));
+game.level!.addActor(new Enemy(game, 0, 0, 2));
+game.level!.addWidget(new WidgetText(game, 0, 0, {}, 0));
+
+assert(game.level!.getActorOfClass(Enemy)!.zIndex === 2, "Assertion Failure - Enemy actor does not have correct zIndex of 2, instead having zIndex of " + game.level!.getActorOfClass(Enemy)!.zIndex.toString());
+assert(game.level!.getWidgetOfClass(WidgetText)!.zIndex === 3, "Assertion Failure - Widget does not have correct zIndex of 3, instead having zIndex of " + game.level!.getWidgetOfClass(WidgetText)!.zIndex.toString());
+
+game.addPersistantActor(new Player(game, 0, 0, 1));
+game.addPersistantWidget(new WidgetText(game, 0, 0, {}, 2));
+
+assert(game.getPersistantActorOfClass(Player)!.zIndex === 1, "Assertion Failure - Persistant instance of player doesn't have zIndex of 1, instead having a zIndex of " + game.getPersistantActorOfClass(Player)!.zIndex.toString());
+assert(game.getPersistantWidgetOfClass(WidgetText)!.zIndex === 5, "Assertion Failure - Persistant instance of WidgetText doesn't have zIndex of 5, instead having a zIndex of " + game.getPersistantWidgetOfClass(WidgetText)!.zIndex.toString());
+
+game.getPersistantActorOfClass(Player)!.setZOrder(3);
+game.level!.getWidgetOfClass(WidgetText)!.setZOrder(5);
+
+assert(game.getPersistantActorOfClass(Player)!.zIndex === 3, "Assertion Failure - Persistant instance of player after zIndex update doesn't have zIndex of 8, instead having a zIndex of " + game.getPersistantActorOfClass(Player)!.zIndex.toString());
+assert(game.level!.getWidgetOfClass(WidgetText)!.zIndex === 9, "Assertion Failure - Widget does not have correct zIndex of 8 after zIndex update, instead having zIndex of " + game.level!.getWidgetOfClass(WidgetText)!.zIndex.toString());
+
+console.log("Assertion Set #9 passed.");
 
 
 console.log("All assertions passed.");

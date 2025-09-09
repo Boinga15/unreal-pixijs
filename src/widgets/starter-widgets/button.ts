@@ -146,11 +146,9 @@ export class WidgetButton extends Widget {
     */
     buttonRect: Graphics
 
-    constructor(game: Game, x: number, y: number, xSize: number, ySize: number, settings: WidgetButtonArguments) {
-        super(game);
+    constructor(game: Game, x: number, y: number, xSize: number, ySize: number, settings: WidgetButtonArguments, zOrder: number = 0) {
+        super(game, x, y, zOrder);
 
-        this.x = x;
-        this.y = y;
         this.xSize = xSize;
         this.ySize = ySize;
 

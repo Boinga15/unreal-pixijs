@@ -93,6 +93,7 @@ export abstract class Level {
     addActor(actor: Actor): Actor {
         this.actors.push(actor);
         actor.onCreate(false, this);
+        this.game.adjustZIndexes();
         return actor;
     }
 
@@ -115,6 +116,7 @@ export abstract class Level {
 
         actor.onRemove();
         this.actors = this.actors.filter((cActor) => cActor !== actor);
+        this.game.adjustZIndexes();
         return true;
     }
 
@@ -174,6 +176,7 @@ export abstract class Level {
         this.widgets.push(newWidget);
         newWidget.level = this;
         newWidget.onConstruct();
+        this.game.adjustZIndexes();
 
         return newWidget;
     }
@@ -186,6 +189,7 @@ export abstract class Level {
     removeWidget(targetWidget: Widget): boolean {
         if (this.widgets.includes(targetWidget)) {
             targetWidget.deconstructWidget();
+            this.game.adjustZIndexes();
             return true;
         }
 

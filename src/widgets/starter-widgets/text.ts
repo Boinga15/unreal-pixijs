@@ -59,11 +59,8 @@ export class WidgetText extends Widget {
     */
     updateFunction: (deltaTime: number, widgetReference: WidgetText) => void
 
-    constructor(game: Game, x: number, y: number, settings: WidgetTextArguments = {}) {
-        super(game);
-
-        this.x = x;
-        this.y = y;
+    constructor(game: Game, x: number, y: number, settings: WidgetTextArguments = {}, zOrder: number = 0) {
+        super(game, x, y, zOrder);
 
         this.text = (settings.text ? settings.text : "Text Object");
         this.fontFamily = (settings.fontFamily ? settings.fontFamily : "Arial");

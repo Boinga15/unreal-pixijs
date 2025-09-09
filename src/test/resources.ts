@@ -34,6 +34,9 @@ export class Level2 extends Level {
 }
 
 
+export class Level3 extends Level {}
+
+
 export class TestScript extends Script {
     update(deltaTime: number): void {
         console.log(deltaTime);

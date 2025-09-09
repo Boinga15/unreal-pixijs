@@ -36,12 +36,18 @@ export abstract class Widget extends Container {
     */
     isPersistant: boolean = false
 
-    constructor(game: Game, x: number = 0, y: number = 0) {
+    /**
+     * The relative zOrder of this widget compared to other actors and widgets.
+    */
+    zOrder = 0
+
+    constructor(game: Game, x: number = 0, y: number = 0, zOrder: number = 0) {
         super();
 
         this.game = game;
         this.x = x;
         this.y = y;
+        this.zOrder = zOrder;
     }
 
     /**
@@ -147,5 +153,14 @@ export abstract class Widget extends Container {
         }
 
         return undefined;
+    }
+
+    /**
+     * Sets the zOrder of the widget, and calls game.adjustZIndexes as well in order to correctly update the zIndexes of this widget as well as every other actor and widget.
+     * @param newZOrder 
+     */
+    setZOrder(newZOrder: number) {
+        this.zOrder = newZOrder;
+        this.game.adjustZIndexes();
     }
 }

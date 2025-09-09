@@ -48,10 +48,19 @@ export abstract class Actor extends Container {
      * ]
      */
     scripts: Script[] = [];
-    
-    constructor(game: Game) {
+
+    /**
+     * The relative zOrder of this actor compared to other actors.
+    */
+    zOrder: number
+
+    constructor(game: Game, x: number = 0, y: number = 0, zOrder: number = 0) {
         super();
         this.game = game;
+        
+        this.x = x;
+        this.y = y;
+        this.zOrder = zOrder;
     }
 
     /**
@@ -119,5 +128,14 @@ export abstract class Actor extends Container {
         }
 
         return undefined;
+    }
+
+    /**
+     * Sets the zOrder of the actor, and calls game.adjustZIndexes as well in order to correctly update the zIndexes of this actor as well as every other actor and widget.
+     * @param newZOrder 
+     */
+    setZOrder(newZOrder: number) {
+        this.zOrder = newZOrder;
+        this.game.adjustZIndexes();
     }
 }
