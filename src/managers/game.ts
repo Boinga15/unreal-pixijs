@@ -1,5 +1,6 @@
 import { Application, Graphics, Rectangle } from "pixi.js"
-import { Actor, Level, Script, Widget } from "..";
+import { Actor, Level, Script, SoundObject, Widget } from "..";
+import { sound } from "@pixi/sound";
 
 // Constructors used to globally allow for any class to be created.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,15 +84,20 @@ export class Game {
     */
     persistantWidgets: Widget[] = []
 
-    constructor(gameWidth: number, gameHeight: number, borderColour: string = "#000000", backgroundColour = "#383838ff") {
+    /**
+     * A list of sound objects currently playing in the game. This list only tracks spawned sounds, not sounds played through playSound().
+    */
+    sounds: SoundObject[] = []
+
+    constructor(gameWidth: number, gameHeight: number, soundLibrary: Record<string, string>, settings: {borderColour: string, backgroundColour: string} = {borderColour: "#000000", backgroundColour: "#383838ff"}) {
         // Define variables.
         this.app = new Application();
         this.gameHeight = gameHeight;
         this.gameWidth = gameWidth;
 
         this.mousePos = {x: 0, y: 0};
-        this.borderColour = borderColour;
-        this.backgroundColour = backgroundColour;
+        this.borderColour = settings.borderColour;
+        this.backgroundColour = settings.backgroundColour;
 
         // Construct game window.
         this.boundingBox = new Graphics().rect(0, 0, this.gameWidth, this.gameHeight).fill(this.backgroundColour);
@@ -101,6 +107,10 @@ export class Game {
         this.mask = new Graphics().rect(0, 0, this.gameWidth, this.gameHeight).fill("#ffffff");
         this.app.stage.mask = this.mask;
         this.app.stage.addChild(this.mask);
+    
+        // Enable sounds
+        sound.init();
+        sound.add(soundLibrary, { preload: true })
     }
 
     /**
@@ -138,6 +148,65 @@ export class Game {
                 widget.zIndex = highestZIndex + widget.zOrder;
             }
         }
+    }
+
+    /**
+     * Plays a sound without creating a whole SoundObject instance. Best used for playing quick sound effects.
+     * @param targetSound The ID of the sound to play.
+     * @param settings Settings for the sound, including volume and whether or not the sound is looping or not.
+     */
+    playSound(targetSound: string, settings: {volume: number, looping: boolean} = {volume: 1.0, looping: false}) {
+        if (!sound.exists(targetSound)) {
+            console.warn(`[Unreal PixiJS] Attempted to play sound "${targetSound}", but this sound was never loaded at the start of the game.`);
+            return;
+        }
+        
+        if (settings.volume < 0) {
+            settings.volume = 0;
+        }
+
+        sound.play(targetSound, {volume: settings.volume, loop: settings.looping});
+    }
+
+    /**
+     * Creates and returns a new sound object. Best used for playing looping sounds or music.
+     * @param targetSound The ID of the sound to play.
+     * @param settings The settings of the sound, including volume, looping, and autoplay.
+     * @returns An instance of the sound object.
+     */
+    spawnSound(targetSound: string, settings: {volume?: number, looping?: boolean, autoplay?: boolean} = {volume: 1.0, looping: false, autoplay: true}) {
+        if (!sound.exists(targetSound)) {
+            console.warn(`[Unreal PixiJS] Attempted to play sound "${targetSound}", but this sound was never loaded at the start of the game.`);
+            return;
+        }
+
+        settings.volume = settings.volume ?? 1.0;
+        
+        if (settings.volume < 0) {
+            settings.volume = 0;
+        }
+
+        const soundReference = new SoundObject(this, targetSound, {
+            volume: settings.volume,
+            looping: settings.looping,
+            autoplay: settings.autoplay
+        });
+
+        this.sounds.push(soundReference);
+
+        return soundReference;
+    }
+
+    /**
+     * Stops all spawned sounds, removing them from the game's sound list as well as stopping the sounds. Also stops all sounds played through playSound().
+     */
+    stopAllSounds() {
+        for (const sound of this.sounds) {
+            sound.stop();
+        }
+
+        this.sounds = [];
+        sound.stopAll();
     }
 
     /**
@@ -209,6 +278,10 @@ export class Game {
 
                 for (const widget of this.persistantWidgets) {
                     widget.update(time.deltaMS / 1000);
+                }
+
+                for (const sound of this.sounds) {
+                    sound.update(time.deltaMS / 1000);
                 }
             });
         })();

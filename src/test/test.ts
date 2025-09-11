@@ -15,7 +15,7 @@ function assert(assertion: boolean, failMessage: string = "ASSERTION FAILED.") {
 
 
 // Assertion Set #1 - Main Game Instance
-const game = new Game(1000, 1000)
+const game = new Game(1000, 1000, {})
 
 assert(game.gameWidth == 1000, "Assertion Failure - Game width is not 1000.");
 assert(game.gameHeight == 1000, "Assertion Failure - Game height is not 1000.");
@@ -317,6 +317,5 @@ assert(game.getPersistantActorOfClass(Player)!.zIndex === 3, "Assertion Failure 
 assert(game.level!.getWidgetOfClass(WidgetText)!.zIndex === 9, "Assertion Failure - Widget does not have correct zIndex of 8 after zIndex update, instead having zIndex of " + game.level!.getWidgetOfClass(WidgetText)!.zIndex.toString());
 
 console.log("Assertion Set #9 passed.");
-
 
 console.log("All assertions passed.");
