@@ -46,6 +46,16 @@ export abstract class Level {
     */
     widgets: Widget[] = []
 
+    /**
+     * The X position of the camera relative to the world origin.
+    */
+    cameraX: number = 0
+    
+    /**
+     * The Y position of the camera relative to the world origin.
+    */
+    cameraY: number = 0
+
     constructor(game: Game) {
         this.game = game;
     }

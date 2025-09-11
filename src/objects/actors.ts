@@ -54,13 +54,41 @@ export abstract class Actor extends Container {
     */
     zOrder: number
 
+    // Used as placeholders for the actor's real x and y positions.
+    private worldX: number
+    private worldY: number
+
     constructor(game: Game, x: number = 0, y: number = 0, zOrder: number = 0) {
         super();
         this.game = game;
         
-        this.x = x;
-        this.y = y;
+        this.worldX = x;
+        this.worldY = y;
         this.zOrder = zOrder;
+    }
+
+    get x() {
+        return this.worldX;
+    }
+
+    get y() {
+        return this.worldY;
+    }
+
+    set x(value: number) {
+        this.worldX = value;
+    }
+
+    set y(value: number) {
+        this.worldY = value;
+    }
+
+    /**
+     * Returns the location of an actor relative to the screen
+     * @returns An object with an x and y element.
+     */
+    getScreenLocation() {
+        return {x: super.x, y: super.y};
     }
 
     /**
@@ -68,6 +96,16 @@ export abstract class Actor extends Container {
      * @param deltaTime The time in seconds between this frame and the previous frame.
      */
     update(deltaTime: number) {
+        // Adjust position based on camera position.
+        if (this.game.level) {
+            super.x = this.worldX - this.game.level.cameraX + Math.floor(this.game.gameWidth / 2);
+            super.y = this.worldY - this.game.level.cameraY + Math.floor(this.game.gameHeight / 2);
+        } else {
+            super.x = this.worldX + Math.floor(this.game.gameWidth / 2);
+            super.y = this.worldY + Math.floor(this.game.gameHeight / 2);
+        }
+
+        // Run all scripts.
         for (const script of this.scripts) {
             script.update(deltaTime);
         }

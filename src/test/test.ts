@@ -13,7 +13,6 @@ function assert(assertion: boolean, failMessage: string = "ASSERTION FAILED.") {
     }
 }
 
-
 // Assertion Set #1 - Main Game Instance
 const game = new Game(1000, 1000, {})
 
@@ -317,5 +316,25 @@ assert(game.getPersistantActorOfClass(Player)!.zIndex === 3, "Assertion Failure 
 assert(game.level!.getWidgetOfClass(WidgetText)!.zIndex === 9, "Assertion Failure - Widget does not have correct zIndex of 8 after zIndex update, instead having zIndex of " + game.level!.getWidgetOfClass(WidgetText)!.zIndex.toString());
 
 console.log("Assertion Set #9 passed.");
+
+
+// Assertion Set #10 - Actor Locations
+const testActor = new Player(game, 0, 0);
+testActor.update(1.0);
+
+assert(testActor.getScreenLocation().x === 500, "Assertion Failure - Test Actor screen x location should be 500, but is instead " + testActor.getScreenLocation().x.toString());
+assert(testActor.getScreenLocation().y === 500, "Assertion Failure - Test Actor screen y location should be 500, but is instead " + testActor.getScreenLocation().y.toString());
+
+testActor.x = 100;
+testActor.y = -200;
+testActor.update(1.0);
+
+assert(testActor.getScreenLocation().x === 600, "Assertion Failure - Test Actor screen x location should be 600, but is instead " + testActor.getScreenLocation().x.toString());
+assert(testActor.getScreenLocation().y === 300, "Assertion Failure - Test Actor screen y location should be 300, but is instead " + testActor.getScreenLocation().y.toString());
+
+assert(testActor.x === 100, "Assertion Failure - Test Actor absolute x location should be 100, but is instead " + testActor.getScreenLocation().x.toString());
+assert(testActor.y === -200, "Assertion Failure - Test Actor absolute y location should be -200, but is instead " + testActor.getScreenLocation().y.toString());
+
+console.log("Assertion Set #10 passed.");
 
 console.log("All assertions passed.");

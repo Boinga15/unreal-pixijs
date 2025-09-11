@@ -107,10 +107,14 @@ export class Game {
         this.mask = new Graphics().rect(0, 0, this.gameWidth, this.gameHeight).fill("#ffffff");
         this.app.stage.mask = this.mask;
         this.app.stage.addChild(this.mask);
-    
+        
         // Enable sounds
-        sound.init();
-        sound.add(soundLibrary, { preload: true })
+        try {
+            sound.init();
+            sound.add(soundLibrary, { preload: true })
+        } catch (e) {
+            console.log("Error encountered during sound load: " + e);
+        }
     }
 
     /**

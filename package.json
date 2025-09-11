@@ -1,6 +1,6 @@
 {
     "name": "unreal-pixijs",
-    "version": "1.0.6",
+    "version": "1.0.8",
     "main": "dist/index.js",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -15,7 +15,7 @@
     },
     "scripts": {
         "lint": "eslint .",
-        "test": "tsx src/test/test.ts",
+        "test": "vite",
         "build": "tsc"
     },
     "devDependencies": {
