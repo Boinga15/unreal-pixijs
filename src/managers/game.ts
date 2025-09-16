@@ -343,7 +343,7 @@ export class Game {
     changeBackgroundColour(newColour: string): void {
         this.backgroundColour = newColour;
 
-        this.boundingBox.clear().rect(0, 0, this.gameWidth, this.gameHeight).fill("#ffffff");
+        this.boundingBox.clear().rect(0, 0, this.gameWidth, this.gameHeight).fill(this.backgroundColour);
     }
 
     /**
@@ -480,7 +480,7 @@ export class Game {
      * @param targetWidget The class to query through.
      * @returns A list of every persistant widget with the given class or a child of the given class.
      */
-    getAllPersistantWidgetsOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T[] {
+    getPersistantWidgetsOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T[] {
         return this.persistantWidgets.filter((widget): widget is T => widget instanceof targetWidgetType);
     }
 
@@ -570,5 +570,18 @@ export class Game {
         }
 
         return angle;
+    }
+
+    /**
+     * Converst a given angle in radians to a vector.
+     * @param angle The angle in radians to convert.
+     * @param magnitude The magnitude of the resultant vector (default is 1).
+     * @returns The x and y components of the resultant vector.
+     */
+    angleToVector(angle: number, magnitude: number = 1): {x: number, y: number} {
+        return {
+            x: Math.cos(angle) * magnitude,
+            y: Math.sin(angle) * magnitude
+        };
     }
 }

@@ -136,7 +136,7 @@ export abstract class Widget extends Container {
      * @param targetWidget The class to query through.
      * @returns A list of every sub-widget currently in this widget with the given class or a child of the given class.
      */
-    getAllSubWidgetsOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T[] {
+    getSubWidgetsOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T[] {
         return this.subWidgets.filter((subWidget): subWidget is T => subWidget instanceof targetWidgetType);
     }
 

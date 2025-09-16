@@ -70,13 +70,13 @@ export class SoundObject {
     /** Destroy the sound object and stop it in the process. */
     destroy() {
         this.stop();
+        this.soundInstance = null;
         this.game.sounds = this.game.sounds.filter((cSound) => cSound !== this);
     }
 
     /** Stop playback. */
     stop() {
         this.soundInstance?.stop();
-        this.soundInstance = null;
     }
 
     /** Replay from start. */

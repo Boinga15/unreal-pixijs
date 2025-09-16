@@ -275,6 +275,18 @@ assert(Math.abs(value - 1.4056) <= 0.1, "Assertion Failure - getAngle for angle 
 value = game.getAngle({x: 3, y: 1}, {x: 2, y: -5});
 assert(Math.abs(value - 4.5472) <= 0.1, "Assertion Failure - getAngle for angle set 3 returns " + value.toString() + " instead of 4.5472.");
 
+let vector = game.angleToVector(0);
+assert(vector.x === 1, "Assertion Failure - Resultant vector x from angle 0 is " + vector.x.toString() + " and not 1.");
+assert(vector.y === 0, "Assertion Failure - Resultant vector y from angle 0 is " + vector.y.toString() + " and not 0.");
+
+vector = game.angleToVector(Math.PI * (3 / 2), 3);
+assert(-0.01 <= vector.x && vector.x <= 0.01, "Assertion Failure - Resultant vector x from angle 3PI/2 and magnitude 3 is " + vector.x.toString() + " and not 0.");
+assert(vector.y === -3, "Assertion Failure - Resultant vector y from angle 3PI/2 and magnitude 3 is " + vector.y.toString() + " and not -3.");
+
+vector = game.angleToVector(23, 2);
+assert(-1.07 <= vector.x && vector.x <= -1.05, "Assertion Failure - Resultant vector x from angle 23 and magnitude 2 is " + vector.x.toString() + " and not -1.06.");
+assert(-1.7 <= vector.y && vector.y <= -1.68, "Assertion Failure - Resultant vector y from angle 23 and magnitude 2 is " + vector.y.toString() + " and not -1.69.");
+
 assert(game.pointToPointCollision({x: 3, y: 3}, {x: 3, y: 3}), "Assertion Failure - pointToPointCollision returns false for two points that have the same locations.");
 assert(!game.pointToPointCollision({x: 3, y: 3}, {x: 3, y: 5}), "Assertion Failure - pointToPointCollision returns true for points with different coordinates (set #1).");
 assert(!game.pointToPointCollision({x: 2, y: 5}, {x: 3, y: 5}), "Assertion Failure - pointToPointCollision returns true for points with different coordinates (set #2).");

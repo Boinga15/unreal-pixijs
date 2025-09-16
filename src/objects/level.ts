@@ -235,7 +235,7 @@ export abstract class Level {
      * @param targetWidget The class to query through.
      * @returns A list of every widget currently in this level with the given class or a child of the given class.
      */
-    getAllWidgetsOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T[] {
+    getWidgetsOfClass<T extends Widget>(targetWidgetType: WidgetConstructor<T>): T[] {
         return this.widgets.filter((widget): widget is T => widget instanceof targetWidgetType);
     }
 
