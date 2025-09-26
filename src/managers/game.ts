@@ -564,7 +564,7 @@ export class Game {
         if (xDiff != 0) {
             angle = Math.atan(yDiff / xDiff);
 
-            if (yDiff <= 0 && xDiff <= 0) {
+            if (xDiff <= 0) {
                 angle += Math.PI;
             }
         }

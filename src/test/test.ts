@@ -275,6 +275,9 @@ assert(Math.abs(value - 1.4056) <= 0.1, "Assertion Failure - getAngle for angle 
 value = game.getAngle({x: 3, y: 1}, {x: 2, y: -5});
 assert(Math.abs(value - 4.5472) <= 0.1, "Assertion Failure - getAngle for angle set 3 returns " + value.toString() + " instead of 4.5472.");
 
+value = game.getAngle({x: 3, y: 1}, {x: 2, y: 6});
+assert(Math.abs(value - 1.76819) <= 0.1, "Assertion Failure - getAngle for angle set 4 returns " + value.toString() + " instead of 1.76819.");
+
 let vector = game.angleToVector(0);
 assert(vector.x === 1, "Assertion Failure - Resultant vector x from angle 0 is " + vector.x.toString() + " and not 1.");
 assert(vector.y === 0, "Assertion Failure - Resultant vector y from angle 0 is " + vector.y.toString() + " and not 0.");
