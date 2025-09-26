@@ -34,7 +34,7 @@ export class Game {
     boundingBox: Graphics;
 
     /**
-     * Mouse position relative to the game area. (0, 0) is considered the top-left corner of the screen.
+     * Mouse position relative to the game area. (0, 0) is considered the top-left corner of the screen. This is NOT relative to the camera, and is best used for widgets. If you need the mouse position in the level itself, use the mousePos found in level.
     */
     mousePos: {x: number, y: number}
 

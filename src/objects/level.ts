@@ -56,6 +56,11 @@ export abstract class Level {
     */
     cameraY: number = 0
 
+    /**
+     * The X and Y position of the mouse relative to the level's camera.
+    */
+    mousePos: {x: number, y: number} = {x: 0, y: 0}
+
     constructor(game: Game) {
         this.game = game;
     }
@@ -71,6 +76,12 @@ export abstract class Level {
 
         for (const widget of this.widgets) {
             widget.update(deltaTime);
+        }
+
+        // Setting camera mouse position.
+        this.mousePos = {
+            x: this.game.mousePos.x + this.cameraX - (this.game.gameWidth / 2),
+            y: this.game.mousePos.y + this.cameraY - (this.game.gameHeight / 2)
         }
     }
 
